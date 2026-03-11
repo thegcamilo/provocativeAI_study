@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  max-width: 100vw; 
+  overflow-x: hidden;
 }
 
 .App-logo {
@@ -128,23 +130,29 @@
   margin-bottom: 50px;
   width: 100%;
 }
-
+/* Container for the entire scale + anchors */
 .scale-row {
   display: flex;
-  align-items: center; 
-  justify-content: center; /* Puts everything in the middle together */
-  flex-wrap: wrap;         /* Allows anchors to drop to a new line if needed */
-  gap: 15px;               /* Space between anchors and the scale */
+  flex-direction: row; /* Force horizontal */
+  flex-wrap: nowrap;    /* Prevent wrapping to new lines */
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  max-width: 100%;
   margin: 15px auto;
+  gap: 8px; /* Small gap to maximize space for text */
+  box-sizing: border-box;
 }
 
+/* The text labels on the ends */
 .scale-anchor {
-  font-size: 1rem;
+  font-size: 1.1rem; /* Slightly smaller to fit mobile */
   font-weight: 500;
   color: #475569;
-  max-width: 180px;        /* Limits width so it wraps if text is long */
   line-height: 1.2;
+  flex: 1; /* Allows anchors to grow/shrink and take up remaining space */
+  min-width: 0; /* Critical: allows text to wrap inside the flex item */
+  word-wrap: break-word;
 }
 
 .anchor-left { 
@@ -155,30 +163,40 @@
   text-align: left; 
 }
 
+/* The container for the 1-9 buttons */
 .scale-options-group {
   display: flex;
   justify-content: center;
-  gap: 8px; /* Tightened the gap between numbers slightly */
+  gap: 4px;
+  flex: 0 0 auto; /* Prevents the numbers from shrinking or growing */
 }
 
 .scale-unit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
-  min-width: 25px;
+  min-width: 22px; /* Tightened for mobile */
 }
 
-/* Responsive tweak for very small screens */
+.scale-unit span {
+  font-size: 1.2rem;
+}
+
+/* Remove or update your previous 600px media query */
 @media (max-width: 600px) {
+  .scale-unit span {
+  font-size: 0.9rem;
+}
+
   .scale-row {
-    flex-direction: column; /* Stacks everything vertically on mobile */
-    gap: 10px;
+    flex-direction: row; /* Keep it horizontal even on mobile */
+    gap: 4px;
+    padding: 0 5px;
   }
   
-  .anchor-left, .anchor-right {
-    text-align: center;
-    max-width: 100%;
+  .scale-anchor {
+    font-size: 0.9rem; /* Shrink text slightly more for very small screens */
   }
 }
