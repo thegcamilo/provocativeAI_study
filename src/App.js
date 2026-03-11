@@ -225,13 +225,13 @@ class App extends Component {
           </div>
 
           <div className="eval-question-container">
-            <p><strong>Q1:</strong> How creative do you find this idea?</p>
-            {this.renderScale("creativity", "Not at all creative", "Extremely creative")}
+            <p><strong>Novelty Question</strong></p>
+            {this.renderScale("creativity", "Not at all novel", "Extremely novel")}
           </div>
 
           <div className="eval-question-container">
-            <p><strong>Q2:</strong> How feasible do you find this idea?</p>
-            {this.renderScale("potential", "Not at all feasible", "Extremely feasible")}
+            <p><strong>Usefulness question</strong></p>
+            {this.renderScale("potential", "Not at all useful", "Extremely useful")}
           </div>
 
           <div style={{ marginTop: '40px' }}>
