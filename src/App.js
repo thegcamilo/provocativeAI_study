@@ -111,12 +111,15 @@ class App extends Component {
 
   skipStage() {
     var currStage = this.state.stages[this.state.currStage];
+    console.log("Current Stage" + currStage);
     if (currStage === "idea") {
         this.sendToLLM();
     } else if (currStage === "eval") {
       console.log("to do");
     } else if (currStage === "llm") {
     var payload = JSON.stringify(this.state.ideas);
+    console.log("sending msg from React");
+    console.log(payload);
         window.parent.postMessage(
           {
             type: 'STUDY_DATA',
