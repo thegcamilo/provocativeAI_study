@@ -69,37 +69,45 @@ class App extends Component {
       ]
     };
 
-    try {
-      const response = await fetch(LUCIDBackendURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    const updatedLlmResponses = [...llmResponses];
+    updatedLlmResponses[ideaNumber] = "test to not spend money";
 
-      if (!response.ok) throw new Error("Network response was not ok");
-
-      const data = await response.json();
-      const generatedText = data.generated_text || "Error: No response text received.";
-
-      const updatedLlmResponses = [...llmResponses];
-      updatedLlmResponses[ideaNumber] = generatedText;
-
-      this.setState({ 
+    this.setState({ 
         llmResponses: updatedLlmResponses, 
         isProcessing: false 
       });
 
-    } catch (error) {
-      console.error("LLM Request Error:", error);
-      const updatedLlmResponses = [...llmResponses];
-      updatedLlmResponses[ideaNumber] = "Sorry, there was an error connecting to the AI service.";
-      alert("There was an error. Please, contact the study administrators");
+    // try {
+    //   const response = await fetch(LUCIDBackendURL, {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(payload)
+    //   });
+
+    //   if (!response.ok) throw new Error("Network response was not ok");
+
+    //   const data = await response.json();
+    //   const generatedText = data.generated_text || "Error: No response text received.";
+
+    //   const updatedLlmResponses = [...llmResponses];
+    //   updatedLlmResponses[ideaNumber] = generatedText;
+
+    //   this.setState({ 
+    //     llmResponses: updatedLlmResponses, 
+    //     isProcessing: false 
+    //   });
+
+    // } catch (error) {
+    //   console.error("LLM Request Error:", error);
+    //   const updatedLlmResponses = [...llmResponses];
+    //   updatedLlmResponses[ideaNumber] = "Sorry, there was an error connecting to the AI service.";
+    //   alert("There was an error. Please, contact the study administrators");
       
-      this.setState({ 
-        llmResponses: updatedLlmResponses, 
-        isProcessing: false 
-      });
-    }
+    //   this.setState({ 
+    //     llmResponses: updatedLlmResponses, 
+    //     isProcessing: false 
+    //   });
+    // }
   }
 
   redirectToSurveyCompletion() {
