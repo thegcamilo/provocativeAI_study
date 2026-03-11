@@ -124,7 +124,8 @@ class App extends Component {
           {
             type: 'STUDY_DATA',
             payload: payload
-          }
+          },
+          '*'
         )
     }
     this.setState({currStage: this.state.currStage + 1});
