@@ -116,7 +116,13 @@ class App extends Component {
     } else if (currStage === "eval") {
       console.log("to do");
     } else if (currStage === "llm") {
-        console.log("to do");
+    var payload = JSON.stringify(this.state.ideas);
+        window.parent.postMessage(
+          {
+            type: 'STUDY_DATA',
+            payload: payload
+          }
+        )
     }
     this.setState({currStage: this.state.currStage + 1});
     window.scrollTo(0, 0);
@@ -274,7 +280,7 @@ class App extends Component {
         </div>
       );
     } else {
-      content = <div>Done!</div>
+      content = <div>React Done!</div>
     }
     return (
       <div className='App'>{content}</div>
