@@ -128,7 +128,7 @@ class App extends Component {
     }
 
     if (currStage === "llm") {
-      this.setState({currStage: 0});
+      this.setState({currStage: 0, ideaNumber: this.state.ideaNumber + 1});
     } else {
       this.setState({currStage: this.state.currStage + 1});
     }
@@ -173,7 +173,7 @@ class App extends Component {
             <label key={num} className="scale-unit">
               <input 
                 type="radio" 
-                name={questionId} 
+                name={questionId + this.state.ideaNumber}
                 value={num}
                 // Check against the current ideaNumber in the responses array
                 checked={this.state.responses[this.state.ideaNumber]?.[questionId] === num.toString()}
