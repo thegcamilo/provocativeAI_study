@@ -20,27 +20,8 @@ class App extends Component {
         init: new Date()
       },
       LUCIDBackendURL: "https://test-lucid.vercel.app/lucid", // Replace with your actual URL,
-      systemPrompt: `
-        IGNORE ALL PREVIOUS INSTRUCTIONS.
-
-        Background
-        - You are assisting a participant in an incentivized creativity competition.  
-        - The participant is brainstorming a movie idea that will be judged by third‑party evaluators on two dimensions of creativity:
-        1. Novelty: how novel the idea is.  
-        2. Usefulness: the idea’s potential to be developed into a successful film
-        - The top‑10 ideas (by averaging novelty + usefulness) will receive a 10 USD reward.
-
-        Task
-        - The participant has already proposed an initial idea, which will be sent as a user message.
-        - Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that they can score higher on both novelty and usefulness.
-        - Your feedback should provide alternative perspectives to the user. It is important that you stimulate the user's creative thinking and make them think about their movie idea. 
-        - You should not explicitly tell the user what they should do; instead, your objective is to offer counterarguments and ask questions to stimulate the user's creative thinking. Do NOT overuse questions. 
-        - The feedback should be actionable.
-
-        Constraints
-        - Keep your suggestion limited to 4-5 sentences.
-        - Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.
-        `,
+      selectedPromptType: "Provocative",
+      systemPrompt: PROMPT_TEMPLATES["Provocative"],
       // uniqueId: "u" + Math.floor(Math.random()*100 * Date.now()).toString(36),
       // prolificId: (params.has("PROLIFIC_PID") ? params.get("PROLIFIC_PID") : (Math.random() + 1).toString(36).substring(7)),
       // // studyId: params.get("STUDY_ID"),
@@ -53,6 +34,7 @@ class App extends Component {
     this.skipStage = this.skipStage.bind(this);
     this.sendToLLM = this.sendToLLM.bind(this);
     this.redirectToSurveyCompletion = this.redirectToSurveyCompletion.bind(this);
+    this.handlePromptChange = this.handlePromptChange.bind(this);
   }
 
   async sendToLLM() {
@@ -72,42 +54,42 @@ class App extends Component {
     const updatedLlmResponses = [...llmResponses];
     updatedLlmResponses[ideaNumber] = "test to not spend money";
 
-    this.setState({ 
+    // this.setState({ 
+    //     llmResponses: updatedLlmResponses, 
+    //     isProcessing: false 
+    //   });
+
+    try {
+      const response = await fetch(LUCIDBackendURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const data = await response.json();
+      const generatedText = data.generated_text || "Error: No response text received.";
+
+      const updatedLlmResponses = [...llmResponses];
+      updatedLlmResponses[ideaNumber] = generatedText;
+
+      this.setState({ 
         llmResponses: updatedLlmResponses, 
         isProcessing: false 
       });
 
-    // try {
-    //   const response = await fetch(LUCIDBackendURL, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(payload)
-    //   });
-
-    //   if (!response.ok) throw new Error("Network response was not ok");
-
-    //   const data = await response.json();
-    //   const generatedText = data.generated_text || "Error: No response text received.";
-
-    //   const updatedLlmResponses = [...llmResponses];
-    //   updatedLlmResponses[ideaNumber] = generatedText;
-
-    //   this.setState({ 
-    //     llmResponses: updatedLlmResponses, 
-    //     isProcessing: false 
-    //   });
-
-    // } catch (error) {
-    //   console.error("LLM Request Error:", error);
-    //   const updatedLlmResponses = [...llmResponses];
-    //   updatedLlmResponses[ideaNumber] = "Sorry, there was an error connecting to the AI service.";
-    //   alert("There was an error. Please, contact the study administrators");
+    } catch (error) {
+      console.error("LLM Request Error:", error);
+      const updatedLlmResponses = [...llmResponses];
+      updatedLlmResponses[ideaNumber] = "Sorry, there was an error connecting to the AI service.";
+      alert("There was an error. Please, contact the study administrators");
       
-    //   this.setState({ 
-    //     llmResponses: updatedLlmResponses, 
-    //     isProcessing: false 
-    //   });
-    // }
+      this.setState({ 
+        llmResponses: updatedLlmResponses, 
+        isProcessing: false 
+      });
+    }
   }
 
   redirectToSurveyCompletion() {
@@ -115,6 +97,14 @@ class App extends Component {
     // let path = "https://mpisws.eu.qualtrics.com/jfe/form/SV_6Wh4Iz782dXDsvc?prolificId=" + 
     // this.state.prolificId + "&uniqueId=" + this.state.uniqueId + "&study=" + this.state.study;
     // window.open(path, "_self");
+  }
+
+  handlePromptChange(e) {
+    const type = e.target.value;
+    this.setState({
+      selectedPromptType: type,
+      systemPrompt: PROMPT_TEMPLATES[type]
+    });
   }
 
   skipStage() {
@@ -136,7 +126,13 @@ class App extends Component {
           '*'
         )
     }
-    this.setState({currStage: this.state.currStage + 1});
+
+    if (currStage === "llm") {
+      this.setState({currStage: 0});
+    } else {
+      this.setState({currStage: this.state.currStage + 1});
+    }
+    
     window.scrollTo(0, 0);
   }
 
@@ -145,6 +141,10 @@ class App extends Component {
     var ideas = this.state.ideas;
     ideas[ideaNumber] = v;
     this.setState({ideas: ideas});
+  }
+
+  savePrompt(v) {
+    this.setState({systemPrompt: v});
   }
 
   saveResponse(question, answer) {
@@ -196,12 +196,36 @@ class App extends Component {
       content = (
         <div className="stage-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
           {/* <h2>Stage 1: Idea Generation</h2> */}
-          <p style={{ textAlign: 'left', marginBottom: '20px' }}>
-            <strong>Instructions:</strong> Insert instructions here. minimum 50 chars
-          </p>
-          
+          <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+            <strong>Instructions:</strong> This is the test interface for the study on Provocative AI. 
+            Your movie idea should be a minimum of 50 characters.
+            You may edit the prompt below however you'd like.
+          </div>
+          <div><strong>Prompt (Editable)</strong></div>
+          <div style={{ marginTop: '0px' }}>
+          {["Provocative", "Sycophantic", "Antagonistic", "Full Idea"].map((type) => (
+            <label key={type} style={{ marginRight: '15px', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                value={type}
+                checked={this.state.selectedPromptType === type}
+                onChange={this.handlePromptChange}
+                style={{ marginRight: '5px' }}
+              />
+              {type}
+            </label>
+          ))}
+        </div>
           <textarea 
-            style={{ width: '100%', height: '200px', padding: '10px', fontSize: '16px',
+            style={{ width: '100%', height: '300px', padding: '10px', fontSize: '16px',
+              fontFamily: 'inherit'
+             }}
+            value={this.state.systemPrompt || ""}
+            onChange={(e) => this.savePrompt(e.target.value)}
+          />
+          <div><strong>Idea</strong></div>
+          <textarea 
+            style={{ width: '100%', height: '100px', padding: '10px', fontSize: '16px',
               fontFamily: 'inherit'
              }}
             placeholder="Type your idea here..."
@@ -234,12 +258,12 @@ class App extends Component {
 
           <div className="eval-question-container">
             <p><strong>Novelty Question</strong></p>
-            {this.renderScale("creativity", "Not at all novel", "Extremely novel")}
+            {this.renderScale("creativity", "Not novel at all", "Extremely novel")}
           </div>
 
           <div className="eval-question-container">
             <p><strong>Usefulness question</strong></p>
-            {this.renderScale("potential", "Not at all useful", "Extremely useful")}
+            {this.renderScale("potential", "Not useful at all", "Extremely useful")}
           </div>
 
           <div style={{ marginTop: '40px' }}>
@@ -264,12 +288,12 @@ class App extends Component {
             "{currentIdea}"
           </div>
 
-          <h3>An AI system gave you the following feedback:</h3>
+          <h3>An AI system gave you the following suggestion:</h3>
           
           {this.state.isProcessing ? (
             <div className="loading-container">
+              <p>The AI system is analyzing your idea...</p>
               <div className="circular-spinner"></div>
-              <p>The AI is analyzing your idea...</p>
             </div>
           ) : (
             <div className="ai-response-box" style={{ 
@@ -301,3 +325,84 @@ class App extends Component {
 }
 
 export default App;
+
+const PROMPT_TEMPLATES = {
+  "Full Idea": `IGNORE ALL PREVIOUS INSTRUCTIONS.
+
+Background
+- You are assisting a participant in an incentivized creativity competition.  
+- The participant is brainstorming a movie idea that will be judged by third‑party evaluators on two dimensions of creativity:
+1. Novelty: how novel the idea is.  
+2. Usefulness: the idea’s potential to be developed into a successful film
+- The top‑10 ideas (by averaging novelty + usefulness) will receive a 10 USD reward.
+
+Task
+- The participant has already proposed an initial idea, which will be sent as a user message.
+- Your job is to suggest an alternative movie idea that builds upon the user's initial idea. Your suggestion should score higher on both novelty and usefulness.
+
+Constraints
+- Do NOT give any commentary, critique, or feedback on the original idea.  
+- Keep your suggestion the same length as the original idea
+- Begin your response exactly with the line: "Here's an idea that is potentially more creative:" You should then skip a line and write the idea.
+
+  `,
+
+  "Provocative": `IGNORE ALL PREVIOUS INSTRUCTIONS.
+
+Background
+- You are assisting a participant in an incentivized creativity competition.  
+- The participant is brainstorming a movie idea that will be judged by third‑party evaluators on two dimensions of creativity:
+1. Novelty: how novel the idea is.  
+2. Usefulness: the idea’s potential to be developed into a successful film
+- The top‑10 ideas (by averaging novelty + usefulness) will receive a 10 USD reward.
+
+Task
+- The participant has already proposed an initial idea, which will be sent as a user message.
+- Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that they can score higher on both novelty and usefulness.
+- Your feedback should provide alternative perspectives to the user. It is important that you stimulate the user's creative thinking and make them think about their movie idea. 
+- You should not explicitly tell the user what they should do; instead, your objective is to offer counterarguments and ask questions to stimulate the user's creative thinking. Do NOT overuse questions. 
+- The feedback should be actionable.
+
+Constraints
+- Keep your suggestion limited to 4-5 sentences.
+- Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`,
+  "Sycophantic": `IGNORE ALL PREVIOUS INSTRUCTIONS.
+
+Background
+- You are assisting a participant in an incentivized creativity competition.  
+- The participant is brainstorming a movie idea that will be judged by third‑party evaluators on two dimensions of creativity:
+1. Novelty: how novel the idea is.  
+2. Usefulness: the idea’s potential to be developed into a successful film
+- The top‑10 ideas (by averaging novelty + usefulness) will receive a 10 USD reward.
+
+Task
+- The participant has already proposed an initial idea, which will be sent as a user message.
+- Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that it scores higher on both novelty and usefulness.
+- Your feedback should be overly agreeable and polite and should affirm the user. 
+- You should not explicitly tell the user what they should do. It is important that you stimulate the user's creative thinking and make them think about their movie idea. 
+- The feedback should be actionable.
+
+Constraints
+- Keep your suggestion limited to 4-5 sentences.
+- Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`,
+
+  "Antagonistic": `IGNORE ALL PREVIOUS INSTRUCTIONS.
+
+Background
+- You are assisting a participant in an incentivized creativity competition.  
+- The participant is brainstorming a movie idea that will be judged by third‑party evaluators on two dimensions of creativity:
+1. Novelty: how novel the idea is.  
+2. Usefulness: the idea’s potential to be developed into a successful film
+- The top‑10 ideas (by averaging novelty + usefulness) will receive a 10 USD reward.
+
+Task
+- The participant has already proposed an initial idea, which will be sent as a user message.
+- Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that it scores higher on both novelty and usefulness.
+- Your feedback should be antagonistic and should be disagreeable, rude, interrupting, and confrontational.
+- You should not explicitly tell the user what they should do. It is important that you stimulate the user's creative thinking and make them think about their movie idea. 
+- The feedback should be actionable.
+
+Constraints
+- Keep your suggestion limited to 4-5 sentences.
+- Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`
+};
