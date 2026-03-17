@@ -240,7 +240,7 @@ class App extends Component {
               disabled={(this.state.ideas[this.state.ideaNumber]?.length || 0) < 50} // Optional: Disable if empty
               style={{padding: '10px 20px', cursor: 'pointer'}}
             >
-              Submit Initial Idea
+              Submit Idea
             </button>
           </div>
         </div>
@@ -310,7 +310,7 @@ class App extends Component {
 
           <div style={{ marginTop: '30px' }}>
              <button className="btn-primary" onClick={this.skipStage} disabled={this.state.isProcessing}>
-               Next
+               Go Back
              </button>
           </div>
         </div>
