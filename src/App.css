@@ -2,6 +2,7 @@
   text-align: center;
   max-width: 100vw; 
   overflow-x: hidden;
+  font-size: 1.1em;
 }
 
 .App-logo {
@@ -22,7 +23,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: 1.1em;
   color: white;
 }
 
@@ -49,7 +50,7 @@
   background-color: #187af3; /* Soft Sky Blue */
   color: white;
   padding: 12px 24px;
-  font-size: 16px;
+  font-size: 1em;
   font-weight: 600;
   border: none;
   border-radius: 8px;
@@ -71,6 +72,70 @@
 .btn-primary:disabled {
   background-color: #e2e8f0; /* Very pale gray-blue */
   color: #94a3b8; /* Faded slate text */
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- Secondary Button (Green) --- */
+.btn-secondary {
+  background-color: #22c55e; /* Vibrant Green */
+  color: white;
+  padding: 12px 24px;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #bbf7d0; /* Soft pale green hover */
+  color: #166534; /* Darker green text for contrast on light bg */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+.btn-secondary:disabled {
+  background-color: #f0fdf4; 
+  color: #bbf7d0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- Tertiary Button (Red) --- */
+.btn-tertiary {
+  background-color: #ef4444; /* Alert Red */
+  color: white;
+  padding: 12px 24px;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.btn-tertiary:hover:not(:disabled) {
+  background-color: #fecaca; /* Soft pale red hover */
+  color: #991b1b; /* Darker red text for contrast */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-tertiary:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+.btn-tertiary:disabled {
+  background-color: #fef2f2;
+  color: #fca5a5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -106,7 +171,7 @@
   margin: 0 auto 30px auto;
   max-width: 800px;
   box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 1.1em;
   line-height: 1.5;
 }
 
@@ -114,20 +179,20 @@
 .idea-display {
   background-color: #f0f7ff; /* Soft blue tint */
   border: 1px solid #d1e2f3;
-  color: #1e293b;
+  color: black;
 }
 
 /* Specific background and border for the AI Feedback */
 .ai-response-box {
   background-color: #f9f9f9; /* Original light grey/white */
   border: 1px solid #ddd;
-  color: #334155;
+  color: black;
 }
 
 /* App.css */
 
 .eval-question-container {
-  margin-bottom: 50px;
+  margin-bottom: 35px;
   width: 100%;
 }
 /* Container for the entire scale + anchors */
@@ -135,7 +200,7 @@
   display: flex;
   flex-direction: row; /* Force horizontal */
   flex-wrap: nowrap;    /* Prevent wrapping to new lines */
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
   max-width: 100%;
@@ -146,13 +211,14 @@
 
 /* The text labels on the ends */
 .scale-anchor {
-  font-size: 1.1rem; /* Slightly smaller to fit mobile */
+  font-size: 1.1em; /* Slightly smaller to fit mobile */
   font-weight: 500;
-  color: #475569;
+  color: black;
   line-height: 1.2;
   flex: 1; /* Allows anchors to grow/shrink and take up remaining space */
   min-width: 0; /* Critical: allows text to wrap inside the flex item */
   word-wrap: break-word;
+  margin-top: 4px;
 }
 
 .anchor-left { 
@@ -181,13 +247,14 @@
 }
 
 .scale-unit span {
-  font-size: 1.2rem;
+  font-size: 1.2em;
 }
 
 /* Remove or update your previous 600px media query */
 @media (max-width: 600px) {
   .scale-unit span {
   font-size: 0.9rem;
+  margin-top: 2px;
 }
 
   .scale-row {
