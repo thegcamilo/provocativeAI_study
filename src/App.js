@@ -277,8 +277,9 @@ class App extends Component {
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
             </div>
           </div>
+          <div></div>
           <textarea 
-            style={{ width: '100%', height: '150px', padding: '10px', fontSize: '1.2em',
+            style={{ width: '95%', height: '150px', padding: '10px', fontSize: '1.2em',
               fontFamily: 'inherit'
              }}
             placeholder="Type your idea here..."
@@ -473,7 +474,7 @@ class App extends Component {
             </div>
           </div>
            <textarea 
-            style={{ width: '100%', height: '150px', padding: '10px', fontSize: '1.2em',
+            style={{ width: '95%', height: '150px', padding: '10px', fontSize: '1.2em',
               fontFamily: 'inherit'
              }}
             defaultValue={this.state.ongoingIdea || ""}
