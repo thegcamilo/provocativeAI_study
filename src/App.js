@@ -170,13 +170,14 @@ class App extends Component {
       var payload = JSON.stringify(this.state);
       console.log("sending msg from React");
       console.log(payload);
-          window.parent.postMessage(
-            {
-              type: 'STUDY_DATA',
-              payload: payload
-            },
-            '*'
-          );
+      window.parent.postMessage(
+        {
+          type: 'STUDY_DATA',
+          payload: payload
+        },
+        '*'
+      );
+      this.setState({currStage: this.state.currStage + 2});
     }
   }
 
@@ -428,15 +429,17 @@ class App extends Component {
           <div style={{ textAlign: 'left', marginBottom: '20px' }}>
           {(this.state.selectedPromptType !== "Human") ? (
             <div>
-              <div style={{ marginBottom: '10px' }}>
-                The AI system gave you the following suggestions on how to increase your idea’s novelty and potential to be developed into a successful movie.
-              </div>
+             
             {this.state.isProcessing ? (
               <div className="loading-container">
-                <p>The AI system is analyzing your idea...</p>
+                <p>The AI system is analyzing your movie idea...</p>
                 <div className="circular-spinner"></div>
               </div>
             ) : (
+              <div>
+              <div style={{ marginBottom: '10px' }}>
+                The AI system gave you the following suggestions on how to increase your idea’s novelty and potential to be developed into a successful movie.
+              </div>
               <div className="ai-response-box" style={{ 
                   padding: '20px', 
                   backgroundColor: '#f9f9f9', 
@@ -446,6 +449,7 @@ class App extends Component {
                   whiteSpace: 'pre-wrap'
               }}>
                 {llmFeedback}
+            </div>
             </div>
             )}
               </div>
@@ -486,7 +490,10 @@ class App extends Component {
         </div>
       );
     } else {
-      content = <div>React Done!</div>
+      content = <div className="loading-container">
+                <p>Loading...</p>
+                <div className="circular-spinner"></div>
+              </div>
     }
     return (
       <div className='App'>{content}</div>
