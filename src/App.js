@@ -121,8 +121,8 @@ class App extends Component {
     console.log("Current Stage" + currStage);
     if (currStage === "idea") {
         const currentIdea = this.state.ideas[this.state.ideaNumber] || "";
-        if (currentIdea.length < 50) {
-          alert("Your idea must be a minimum of 50 characters.")
+        if ((currentIdea.match(/[.!?]+/g) || []).length < 3 || currentIdea.length < 50) {
+          alert("Your idea must have at least 3 sentences and be at least 50 characters long.")
         } else {
           this.sendToLLM();
           this.saveTime(this.state.stages[this.state.currStage] + this.state.ideaNumber);
@@ -147,8 +147,8 @@ class App extends Component {
       // implement logic depending on the button pressed
     const currentIdea = this.state.ideas[this.state.ideaNumber];
     const ongoingIdea = this.state.ongoingIdea;
-    if (ongoingIdea.length < 50) {
-      alert("Your idea must be a minimum of 50 characters.")
+     if ((ongoingIdea.match(/[.!?]+/g) || []).length < 3 || ongoingIdea.length < 50) {
+      alert("Your idea must have at least 3 sentences and be at least 50 characters long.")
     } else if(currentIdea === ongoingIdea) {
       alert("You must iterate on your idea given the AI system's suggestions.")
     } else {
@@ -281,7 +281,10 @@ class App extends Component {
         <div className="stage-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
           <div style={{ textAlign: 'left', marginBottom: '20px' }}>
             <div style={{ marginBottom: '10px' }}>
-              <strong>Instructions:</strong> Write your movie idea in the text box below. Your idea must be longer than 50 characters. 
+              <strong>Instructions:</strong> Write your movie idea in the text box below. 
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              Your movie idea must be at least <strong>three (3) sentences</strong> and <strong>50 characters</strong> long.
             </div>
             <div style={{ marginBottom: '10px' }}>
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
@@ -302,6 +305,13 @@ class App extends Component {
             onCut={handleCopyPaste}
             onChange={(e) => this.saveIdea(e.target.value)}
           />
+          <div style = {{textAlign: "right"}}>Sentence count: {(this.state.ideas[this.state.ideaNumber]) ? 
+          (this.state.ideas[this.state.ideaNumber].match(/[.!?]+/g) || []).length :
+          "0"
+          } / Character count: {(this.state.ideas[this.state.ideaNumber]) ? 
+          (this.state.ideas[this.state.ideaNumber].length) :
+          "0"
+          }</div>
           
           <div style={{ marginTop: '20px' }}>
             <button 
@@ -497,6 +507,13 @@ class App extends Component {
             // value={this.state.ongoingIdea || ""}
             onChange={(e) => this.saveOngoingIdea(e.target.value)}
           />
+          <div style = {{textAlign: "right"}}>Sentence count: {(this.state.ongoingIdea) ? 
+          (this.state.ongoingIdea.match(/[.!?]+/g) || []).length :
+          "0"
+          } / Character count: {(this.state.ongoingIdea) ? 
+          (this.state.ongoingIdea.length) :
+          "0"
+          }</div>
           </div>
         </div>
              <div style={{ marginTop: '30px' }}>
