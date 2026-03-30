@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/provocativeAI_study/static/css/main.e5966152.css",
-    "main.js": "/provocativeAI_study/static/js/main.c5e57f5c.js",
+    "main.js": "/provocativeAI_study/static/js/main.fe1254ff.js",
     "static/js/453.1a3b43e7.chunk.js": "/provocativeAI_study/static/js/453.1a3b43e7.chunk.js",
     "index.html": "/provocativeAI_study/index.html",
     "main.e5966152.css.map": "/provocativeAI_study/static/css/main.e5966152.css.map",
-    "main.c5e57f5c.js.map": "/provocativeAI_study/static/js/main.c5e57f5c.js.map",
+    "main.fe1254ff.js.map": "/provocativeAI_study/static/js/main.fe1254ff.js.map",
     "453.1a3b43e7.chunk.js.map": "/provocativeAI_study/static/js/453.1a3b43e7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e5966152.css",
-    "static/js/main.c5e57f5c.js"
+    "static/js/main.fe1254ff.js"
   ]
 }
