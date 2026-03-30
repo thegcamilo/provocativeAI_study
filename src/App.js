@@ -125,6 +125,7 @@ class App extends Component {
           alert("Your idea must be a minimum of 50 characters.")
         } else {
           this.sendToLLM();
+          this.saveTime(this.state.stages[this.state.currStage] + this.state.ideaNumber);
           this.setState({currStage: this.state.currStage + 1});
         }
     } else if (currStage === "eval") {
@@ -134,6 +135,7 @@ class App extends Component {
       if (!currentResp.novelty || !currentResp.potential) {
         alert("Please answer all questions.");
       } else {
+        this.saveTime(this.state.stages[this.state.currStage] + this.state.ideaNumber);
         if (this.state.ideaNumber === 0) {
           this.setState({currStage: this.state.currStage + 1, ongoingIdea: currentIdea});
         } else {
@@ -153,6 +155,7 @@ class App extends Component {
       const ideaNumber = this.state.ideaNumber;
       const ideas = this.state.ideas;
       ideas[ideaNumber + 1] = ongoingIdea;
+      this.saveTime(this.state.stages[this.state.currStage] + this.state.ideaNumber);
       this.setState({ideas: ideas, currStage: 1, ideaNumber: this.state.ideaNumber + 1});
     }     
     }
@@ -162,21 +165,21 @@ class App extends Component {
   
   finishStudy() {
     const currentResp = this.state.responses[this.state.ideaNumber] || {};
-    const currentIdea = this.state.ideas[this.state.ideaNumber];
+    // const currentIdea = this.state.ideas[this.state.ideaNumber];
     console.log(this.state.responses[this.state.ideaNumber]);
     if (!currentResp.novelty || !currentResp.potential) {
       alert("Please answer all questions.");
     } else {
       var payload = JSON.stringify(this.state);
-      console.log("sending msg from React");
+      // console.log("sending msg from React");
       console.log(payload);
-      window.parent.postMessage(
-        {
-          type: 'STUDY_DATA',
-          payload: payload
-        },
-        '*'
-      );
+      window.parent.postMessage({
+        type: 'COMPLETE_SUBMISSION',
+        payload: {
+          studyData: payload,
+          finalIdea: this.state.ideas[this.state.ideaNumber]
+        }
+      }, '*');
       this.setState({currStage: this.state.currStage + 2});
     }
   }
@@ -261,10 +264,17 @@ class App extends Component {
     );
   }
 
+
+
   render() {
     const currStageName = this.state.stages[this.state.currStage];
-    const condition = this.state.selectedPromptType;
+    // const condition = this.state.selectedPromptType;
     let content;
+
+    const handleCopyPaste = (e) => {
+      e.preventDefault();
+      alert(`Please, do not copy and paste your initial idea.\nInstead, come up with your own movie idea!`);
+    };
 
     if (currStageName === "idea") {
       content = (
@@ -273,17 +283,23 @@ class App extends Component {
             <div style={{ marginBottom: '10px' }}>
               <strong>Instructions:</strong> Write your movie idea in the text box below. Your idea must be longer than 50 characters. 
             </div>
-            <div>
+            <div style={{ marginBottom: '10px' }}>
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
+            </div>
+            <div>
+              Please, do not copy and paste an existing movie idea or use AI tools to generate a new movie idea. We are interested in how <strong>you</strong> come up with creative ideas.
             </div>
           </div>
           <div></div>
           <textarea 
-            style={{ width: '95%', height: '150px', padding: '10px', fontSize: '1.2em',
+            style={{ width: '98%', height: '150px', padding: '10px', fontSize: '1.2em',
               fontFamily: 'inherit'
              }}
             placeholder="Type your idea here..."
             value={this.state.ideas[this.state.ideaNumber] || ""}
+            onCopy={handleCopyPaste}
+            onPaste={handleCopyPaste}
+            onCut={handleCopyPaste}
             onChange={(e) => this.saveIdea(e.target.value)}
           />
           
@@ -300,7 +316,7 @@ class App extends Component {
       //////////////////////////////////////////////////////////////////
     } else if (currStageName === "eval") {
     const currentIdea = this.state.ideas[this.state.ideaNumber];
-    const currentResp = this.state.responses[this.state.ideaNumber] || {};
+    // const currentResp = this.state.responses[this.state.ideaNumber] || {};
     
     content = (
         <div className="stage-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
@@ -423,7 +439,7 @@ class App extends Component {
       //////////////////////////////////////////////////////////////////
     } else if (currStageName === "llm") {
       const llmFeedback = this.state.llmResponses[this.state.ideaNumber];
-      const currentIdea = this.state.ideas[this.state.ideaNumber];
+      // const currentIdea = this.state.ideas[this.state.ideaNumber];
       
       content = (
         <div className="stage-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
