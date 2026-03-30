@@ -284,7 +284,7 @@ class App extends Component {
               <strong>Instructions:</strong> Write your movie idea in the text box below. 
             </div>
             <div style={{ marginBottom: '10px' }}>
-              Your movie idea must be at least <strong>three (3) sentences</strong> and <strong>50 characters</strong> long.
+              Your movie idea must be at least <strong>3 sentences</strong> and <strong>50 characters</strong> long.
             </div>
             <div style={{ marginBottom: '10px' }}>
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
