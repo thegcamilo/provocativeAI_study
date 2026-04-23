@@ -75,6 +75,8 @@ class App extends Component {
         body: JSON.stringify(payload)
       });
 
+      console.log(response);
+
       if (!response.ok) throw new Error("Network response was not ok");
 
       const data = await response.json();
@@ -287,7 +289,7 @@ class App extends Component {
               Your idea must be at least <strong>3 sentences</strong> and <strong>50 characters</strong> long. 
             </div>
             <div style={{ marginBottom: '10px' }}>
-              You may structure your movie idea considering three parts: 1) an <strong>introduction</strong> to set the scene of the movie, 2) a <strong>climax</strong> where the tension peaks, and 3) a <strong>resolution</strong> that concludes the movie.
+              You may structure your movie idea by considering three parts: 1) an <strong>introduction</strong> to set the scene of the movie, 2) a <strong>climax</strong> where the tension peaks, and 3) a <strong>resolution</strong> that concludes the movie.
             </div>
             <div style={{ marginBottom: '10px' }}>
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
@@ -554,7 +556,7 @@ const EVAL_QUESTIONS = {
 }
 
 const PROMPT_TEMPLATES = {
-  "Full Idea": `IGNORE ALL PREVIOUS INSTRUCTIONS.
+  "Human": `IGNORE ALL PREVIOUS INSTRUCTIONS.
 
 Background
 - You are assisting a participant in an incentivized creativity competition.  
@@ -573,7 +575,9 @@ Constraints
 - Begin your response exactly with the line: "Here's an idea that is potentially more creative:" You should then skip a line and write the idea.
 
   `,
-
+/////////
+/////////
+/////////
   "Provocative": `IGNORE ALL PREVIOUS INSTRUCTIONS.
 
 Background
@@ -593,6 +597,9 @@ Task
 Constraints
 - Keep your suggestion limited to 4-5 sentences.
 - Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`,
+/////////
+/////////
+/////////
   "Sycophantic": `IGNORE ALL PREVIOUS INSTRUCTIONS.
 
 Background
@@ -612,7 +619,9 @@ Task
 Constraints
 - Keep your suggestion limited to 4-5 sentences.
 - Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`,
-
+/////////
+/////////
+/////////
   "Antagonistic": `IGNORE ALL PREVIOUS INSTRUCTIONS.
 
 Background
