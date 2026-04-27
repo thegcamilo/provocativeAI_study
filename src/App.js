@@ -362,7 +362,7 @@ class App extends Component {
 
 
       </div>
-                      <hr/>
+          {/* <hr/> */}
         {(this.state.ideaNumber === 0) ? (
           <div style={{ marginTop: '40px' }}>
             <button 
@@ -373,16 +373,17 @@ class App extends Component {
           </div>
         ) : (
          <div>
+            <hr/>
             <div style={{ textAlign: 'left', marginBottom: '20px' }}>
               {(this.state.selectedPromptType === "Human") ? (
               <div style={{ marginBottom: '10px' }}>
                 <div style={{ marginBottom: '10px' }}>
-                You can now decide if you’d like to iterate on your idea further or if you’d like to submit your current idea for consideration at the competition.
+                You can now decide if you’d like to iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
                 <ul>
                   <li>If you want to receive further iterate on your idea, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
                        Iterate on my idea
                     </button> below.</li>
-                  <li>If you want to submit your current idea for consideration, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
+                  <li>If you want to submit your current idea for evaluation, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
                       Submit final idea
                     </button> below.</li>
                 </ul>
@@ -411,17 +412,17 @@ class App extends Component {
               </div>
               ) : (
               <div style={{ marginBottom: '10px' }}>
-                You can now decide if you’d like to receive more AI suggestions and iterate on your idea further or if you’d like to submit your current idea for consideration at the competition.
+                You can now decide if you’d like to receive more AI suggestions and iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
                 <ul>
                   <li>If you want to receive more AI suggestions and further iterate on your idea, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
                       Receive AI suggestion
                     </button> below.</li>
-                  <li>If you want to submit your current idea for consideration, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
+                  <li>If you want to submit your current idea for evaluation, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
                       Submit final idea
                     </button> below.</li>
                 </ul>
                 <div style={{ 
-                              marginTop: '40px', 
+                              marginTop: '0px', 
                               display: 'flex', 
                               justifyContent: 'center', 
                               gap: '20px' // This creates consistent space between the buttons
@@ -489,15 +490,14 @@ class App extends Component {
             <div></div>
           )}
             
-
           <div>
             <div style={{ textAlign: 'left', marginBottom: '20px' }}>
             <div style={{ marginBottom: '10px' }}>
               <strong>
-                {(this.selectedPromptType !== "Human") ? 
+                {(this.state.selectedPromptType !== "Human") ? 
                 "Taking into consideration the AI suggestions, iterate on your idea." :
-                "Taking into consideration your idea's novelty and potential to be developed into a successful movie, iterate on your idea."}
-
+                "Taking into consideration your idea's novelty and potential to be developed into a successful movie, iterate on your idea."
+                }
               </strong>
             </div>
             <div>
@@ -556,7 +556,7 @@ const EVAL_QUESTIONS = {
 }
 
 const PROMPT_TEMPLATES = {
-  "Human": `Background
+  "Edit": `Background
 - You are assisting a participant in an incentivized movie idea competition.  
 - The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
 1. The idea’s novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
