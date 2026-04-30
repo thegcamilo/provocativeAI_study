@@ -380,12 +380,18 @@ class App extends Component {
                 <div style={{ marginBottom: '10px' }}>
                 You can now decide if you’d like to iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
                 <ul>
+                {/*
                   <li>If you want to receive iterate on your idea further, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
                        Iterate on my idea
                     </button> below.</li>
+                */}
+                    <li>If you want to receive iterate on your idea further, click <strong>"Iterate on my idea"</strong> below.</li>
+                 {/*
                   <li>If you want to submit your current idea for evaluation, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
                       Submit final idea
                     </button> below.</li>
+                  */}
+                  <li>If you want to submit your current idea for evaluation, click <strong>"Submit final idea"</strong> below.</li>
                 </ul>
                 <div style={{ 
                               marginTop: '40px', 
@@ -414,12 +420,8 @@ class App extends Component {
               <div style={{ marginBottom: '10px' }}>
                 You can now decide if you’d like to receive more AI suggestions and iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
                 <ul>
-                  <li>If you want to receive more AI suggestions and further iterate on your idea, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
-                      Receive AI suggestion
-                    </button> below.</li>
-                  <li>If you want to submit your current idea for evaluation, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
-                      Submit final idea
-                    </button> below.</li>
+                  <li>If you want to receive more AI suggestions and further iterate on your idea, click <strong>"Receive AI suggestion"</strong> below.</li>
+                  <li>If you want to submit your current idea for evaluation, click <strong>"Submit final idea"</strong> below.</li>
                 </ul>
                 <div style={{ 
                               marginTop: '0px', 
