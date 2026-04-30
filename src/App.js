@@ -152,7 +152,7 @@ class App extends Component {
      if ((ongoingIdea.match(/[.!?]+/g) || []).length < 3 || ongoingIdea.length < 50) {
       alert("Your idea must have at least 3 sentences and be at least 50 characters long.")
     } else if(currentIdea === ongoingIdea) {
-      alert("You must iterate on your idea given the AI system's suggestions.")
+      alert("You must iterate on your idea.")
     } else {
       const ideaNumber = this.state.ideaNumber;
       const ideas = this.state.ideas;
