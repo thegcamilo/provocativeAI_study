@@ -380,7 +380,7 @@ class App extends Component {
                 <div style={{ marginBottom: '10px' }}>
                 You can now decide if you’d like to iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
                 <ul>
-                  <li>If you want to receive further iterate on your idea, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
+                  <li>If you want to receive iterate on your idea further, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
                        Iterate on my idea
                     </button> below.</li>
                   <li>If you want to submit your current idea for evaluation, click <button style={{ pointerEvents: 'none' }} className="btn-tertiary">
