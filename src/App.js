@@ -511,6 +511,7 @@ class App extends Component {
               fontFamily: 'inherit'
              }}
             defaultValue={this.state.ongoingIdea || ""}
+            disabled={this.state.isProcessing}
             // value={this.state.ongoingIdea || ""}
             onChange={(e) => this.saveOngoingIdea(e.target.value)}
           />
