@@ -8,7 +8,7 @@ class App extends Component {
     const urlSearchString = window.location.search;
     const params = new URLSearchParams(urlSearchString);
 
-    const invertQuestions = Math.random() < 0.5;
+    const invertQuestions = Math.random() > 0.5;
     const baseOrder = ['novelty', 'potential'];
     const sessionOrder = invertQuestions ? [...baseOrder].reverse() : baseOrder;
 
@@ -510,7 +510,9 @@ class App extends Component {
             ) : (
               <div>
               <div style={{ marginBottom: '10px' }}>
-                The AI system gave you the following suggestions on how to increase your idea's novelty and potential to be developed into a successful movie.
+                <strong>
+                  The AI system gave you the following suggestions on how to increase your idea's novelty and potential to be developed into a successful movie.
+                </strong>
               </div>
               <div className="ai-response-box" style={{ 
                   padding: '20px', 
@@ -541,9 +543,14 @@ class App extends Component {
                 }
               </strong>
             </div>
-            <div>
+            <div style={{ marginBottom: '10px' }}>
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
             </div>
+            {(this.state.selectedPromptType !== "Human" && this.state.selectedPromptType !== "Edit") ?
+            "Please, do not copy and paste the AI suggestions into the text box below. Instead, iterate on your idea by yourself while taking the AI suggestions into consideration." :
+            (this.state.selectedPromptType === "Human") ?
+            "Please, do not copy and paste an existing movie plot or use AI tools to edit your idea. Instead, iterate on your idea by yourself." :
+            ""}
           </div>
            <textarea 
             style={{ width: '95%', height: '150px', padding: '10px', fontSize: '1.2em',
@@ -614,7 +621,7 @@ Task
 Constraints
 - Do NOT give any commentary, critique, or feedback on the original idea.  
 - Keep your suggestion to a length very similar to the participants' original idea
-- Start your response exactly with the line: "Here's an idea for a movie that is potentially more novel and that has higher potential to be developed into a successful movie:" You should then skip a line and write the idea.`,
+- Start your response exactly with the line: "Here's an idea for a movie that is more novel and that has higher potential to be developed into a successful movie:" You should then skip a line and write the idea.`,
 /////////
 /////////
 /////////
@@ -630,7 +637,7 @@ Task
 - Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that their idea scores higher on both novelty and potential to be developed into a successful movie.
 - Your feedback should be *provocative.* It should provide alternative perspectives to the user and make them reflect about their movie idea.
 - You should not validate or comfort the user. Instead, your suggestions should immediately disrupt any cliché and predictability in their initial idea as a way to stimulate their creative thinking.
-- Your objecive is also not to merely critique the idea. Your suggestions should introduce a radical counterargument, a high-stakes dilemma, or a radical inversion of the idea. Your suggestions should focus on completely reframing or questioning the premise of the user's idea rather than providing incremental improvements.
+- Your objective is also not to merely critique the idea. Your suggestions should introduce a radical counterargument, a high-stakes dilemma, or a radical inversion of the idea. Your suggestions should focus on completely reframing or questioning the premise of the user's idea rather than providing incremental improvements.
 - Your questions should challenge the central assumptions of the idea, expose hidden clichés, and introduce a radically different perspective on the idea. 
 - You should not explicitly tell the user what they should do. Instead, you should provide feedback that helps them come up with ideas that are more novel and that have higher potential to be developed into a successful movie.
 - Importantly, your suggestions should be actionable and assist the user in winning the competition.
