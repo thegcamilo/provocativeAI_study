@@ -8,6 +8,12 @@ class App extends Component {
     const urlSearchString = window.location.search;
     const params = new URLSearchParams(urlSearchString);
 
+    const invertQuestions = Math.random() < 0.5;
+    const baseOrder = ['novelty', 'potential'];
+    const sessionOrder = invertQuestions ? [...baseOrder].reverse() : baseOrder;
+
+    const invertScaleSession = Math.random() < 0.5;
+
     this.state = {
       stages: ["idea", "eval", "llm", "end"],
       currStage: 0,
@@ -16,8 +22,10 @@ class App extends Component {
       ongoingIdea: "",
       responses: [{novelty: null, potential: null}],
       llmResponses: [],
-      evalOrder: ['novelty', 'potential'].sort(() => Math.random() - 0.5),
+      evalOrder: sessionOrder,
+      invertScale: invertScaleSession,
       isProcessing: false,
+      pasteEvents: [],
       time: {
         init: new Date()
       },
@@ -146,13 +154,12 @@ class App extends Component {
         }
       }
     } else if (currStage === "llm") {
-      // implement logic depending on the button pressed
     const currentIdea = this.state.ideas[this.state.ideaNumber];
     const ongoingIdea = this.state.ongoingIdea;
      if ((ongoingIdea.match(/[.!?]+/g) || []).length < 3 || ongoingIdea.length < 50) {
       alert("Your idea must have at least 3 sentences and be at least 50 characters long.")
-    } else if(currentIdea === ongoingIdea) {
-      alert("You must iterate on your idea.")
+    // } else if(currentIdea === ongoingIdea) {
+      // alert("You must iterate on your idea.")
     } else {
       const ideaNumber = this.state.ideaNumber;
       const ideas = this.state.ideas;
@@ -172,6 +179,7 @@ class App extends Component {
     if (!currentResp.novelty || !currentResp.potential) {
       alert("Please answer all questions.");
     } else {
+      this.saveTime(this.state.stages[this.state.currStage] + this.state.ideaNumber);
       var payload = JSON.stringify(this.state);
       // console.log("sending msg from React");
       console.log(payload);
@@ -243,28 +251,38 @@ class App extends Component {
 // }
 
   renderScale(questionId, leftAnchor, rightAnchor) {
-    return (
-      <div className="scale-row">
-        <div className="scale-anchor anchor-left">{leftAnchor}</div>
-        <div className="scale-options-group">
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-            <label key={num} className="scale-unit">
-              <input 
-                type="radio" 
-                name={questionId + this.state.ideaNumber}
-                value={num}
-                // Check against the current ideaNumber in the responses array
-                checked={this.state.responses[this.state.ideaNumber]?.[questionId] === num.toString()}
-                onChange={(e) => this.saveResponse(questionId, e.target.value)}
-              />
-              <span>{num}</span>
-            </label>
-          ))}
-        </div>
-        <div className="scale-anchor anchor-right">{rightAnchor}</div>
+  const { invertScale } = this.state;
+
+  // 1. Determine anchor text layout based on session setting
+  const displayLeftAnchor = invertScale ? rightAnchor : leftAnchor;
+  const displayRightAnchor = invertScale ? leftAnchor : rightAnchor;
+
+  // 2. Generate numbers: [0..8] normal, or [8..0] inverted
+  const baseNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  const displayNumbers = invertScale ? [...baseNumbers].reverse() : baseNumbers;
+
+  return (
+    <div className="scale-row">
+      <div className="scale-anchor anchor-left">{displayLeftAnchor}</div>
+      <div className="scale-options-group">
+        {displayNumbers.map((num) => (
+          <label key={num} className="scale-unit">
+            <input 
+              type="radio" 
+              name={questionId + this.state.ideaNumber}
+              value={num}
+              // Checks if stored answer matches this radio button's literal value
+              checked={this.state.responses[this.state.ideaNumber]?.[questionId] === num.toString()}
+              onChange={(e) => this.saveResponse(questionId, e.target.value)}
+            />
+            <span>{num}</span>
+          </label>
+        ))}
       </div>
-    );
-  }
+      <div className="scale-anchor anchor-right">{displayRightAnchor}</div>
+    </div>
+  );
+}
 
 
 
@@ -276,6 +294,25 @@ class App extends Component {
     const handleCopyPaste = (e) => {
       e.preventDefault();
       alert(`Please, do not copy and paste your initial idea.\nInstead, come up with your own movie idea!`);
+    };
+
+    const savePaste = (e) => {
+      // const pastedText = e.clipboardData.getData('text');
+      const eventAction = e.type;
+
+      const targetText = eventAction === 'paste' 
+      ? e.clipboardData.getData('text') 
+      : window.getSelection().toString();
+
+      // Check if the pasted text is not empty (and not just whitespace)
+      if (targetText && targetText.trim() !== '') {
+        this.setState((prevState) => ({
+          pasteEvents: [
+            ...prevState.pasteEvents, 
+            { "n": prevState.ideaNumber, "text": targetText, "event": eventAction }
+          ]
+        }));
+      }
     };
 
     if (currStageName === "idea") {
@@ -295,7 +332,7 @@ class App extends Component {
               Reminder: Your movie idea will be evaluated by an independent jury concerning its novelty and its potential to be developed into a successful movie.
             </div>
             <div>
-              Please, do not copy and paste an existing movie idea or use AI tools to generate a new movie idea. We are interested in how <strong>you</strong> come up with creative ideas.
+              Please, do not copy and paste an existing movie plot or use AI tools to generate an initial idea. We are interested in how <strong>you</strong> come up with creative ideas.
             </div>
           </div>
           <div></div>
@@ -378,7 +415,7 @@ class App extends Component {
               {(this.state.selectedPromptType === "Human") ? (
               <div style={{ marginBottom: '10px' }}>
                 <div style={{ marginBottom: '10px' }}>
-                You can now decide if you’d like to iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
+                You can now decide if you'd like to iterate on your idea further or if you'd like to submit your current idea for evaluation at the competition.
                 <ul>
                 {/*
                   <li>If you want to iterate on your idea further, click <button style={{ pointerEvents: 'none' }} className="btn-secondary">
@@ -418,7 +455,7 @@ class App extends Component {
               </div>
               ) : (
               <div style={{ marginBottom: '10px' }}>
-                You can now decide if you’d like to receive more AI suggestions and iterate on your idea further or if you’d like to submit your current idea for evaluation at the competition.
+                You can now decide if you'd like to receive more AI suggestions and iterate on your idea further or if you'd like to submit your current idea for evaluation at the competition.
                 <ul>
                   <li>If you want to receive more AI suggestions and iterate on your idea further, click <strong>"Receive AI suggestion"</strong> below.</li>
                   <li>If you want to submit your current idea for evaluation, click <strong>"Submit final idea"</strong> below.</li>
@@ -473,7 +510,7 @@ class App extends Component {
             ) : (
               <div>
               <div style={{ marginBottom: '10px' }}>
-                The AI system gave you the following suggestions on how to increase your idea’s novelty and potential to be developed into a successful movie.
+                The AI system gave you the following suggestions on how to increase your idea's novelty and potential to be developed into a successful movie.
               </div>
               <div className="ai-response-box" style={{ 
                   padding: '20px', 
@@ -482,7 +519,9 @@ class App extends Component {
                   borderRadius: '8px',
                   textAlign: 'left',
                   whiteSpace: 'pre-wrap'
-              }}>
+              }}
+                onCopy={savePaste}
+              >
                 {llmFeedback}
             </div>
             </div>
@@ -513,6 +552,7 @@ class App extends Component {
             defaultValue={this.state.ongoingIdea || ""}
             disabled={this.state.isProcessing}
             // value={this.state.ongoingIdea || ""}
+            onPaste={savePaste}
             onChange={(e) => this.saveOngoingIdea(e.target.value)}
           />
           <div style = {{textAlign: "right"}}>Sentence count: {(this.state.ongoingIdea) ? 
@@ -562,18 +602,18 @@ const PROMPT_TEMPLATES = {
   "Edit": `Background
 - You are assisting a participant in an incentivized movie idea competition.  
 - The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
-1. The idea’s novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
-2. The idea’s potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
-- The top‑5 ideas (by averaging the two factors) will receive a 25 USD reward.
+1. The idea's novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
+2. The idea's potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
+- The top-5 ideas (by averaging the two factors) will receive a 25 USD reward.
 
 Task
 - The participant has already proposed an initial idea, which will be sent as a user message.
-- Your job is to suggest an alternative movie idea that builds upon the user's initial idea. Your suggestion should increase the ideas’ novelty and potential to be developed into a successful movie. Nonetheless, the idea you suggest should still be similar to the user’s initial idea
+- Your job is to suggest an alternative movie idea that builds upon the user's initial idea. Your suggestion should increase the ideas' novelty and potential to be developed into a successful movie. Nonetheless, the idea you suggest should still be similar to the user's initial idea
 - Importantly, your suggestions should assist the users in winning the competition.
 
 Constraints
 - Do NOT give any commentary, critique, or feedback on the original idea.  
-- Keep your suggestion to a length very similar to the participants’ original idea
+- Keep your suggestion to a length very similar to the participants' original idea
 - Start your response exactly with the line: "Here's an idea for a movie that is potentially more novel and that has higher potential to be developed into a successful movie:" You should then skip a line and write the idea.`,
 /////////
 /////////
@@ -581,15 +621,17 @@ Constraints
   "Provocative": `Background
 - You are assisting a participant in an incentivized movie idea competition.  
 - The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
-1. The idea’s novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
-2. The idea’s potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
-- The top‑5 ideas (by averaging the two factors) will receive a 25 USD reward.
+1. The idea's novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
+2. The idea's potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
+- The top-5 ideas (by averaging the two factors) will receive a 25 USD reward.
 
 Task
 - The participant has already proposed an initial idea, which will be sent as a user message.
 - Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that their idea scores higher on both novelty and potential to be developed into a successful movie.
-- Your feedback should be *provocative.* It should provide alternative perspectives to the user to stimulate their creative thinking and make them reflect about their movie idea.
-- Your objective is to highlight the strengths and weaknesses of the current idea, offer counterarguments, and ask questions to stimulate the user's creative thinking. 
+- Your feedback should be *provocative.* It should provide alternative perspectives to the user and make them reflect about their movie idea.
+- You should not validate or comfort the user. Instead, your suggestions should immediately disrupt any cliché and predictability in their initial idea as a way to stimulate their creative thinking.
+- Your objecive is also not to merely critique the idea. Your suggestions should introduce a radical counterargument, a high-stakes dilemma, or a radical inversion of the idea. Your suggestions should focus on completely reframing or questioning the premise of the user's idea rather than providing incremental improvements.
+- Your questions should challenge the central assumptions of the idea, expose hidden clichés, and introduce a radically different perspective on the idea. 
 - You should not explicitly tell the user what they should do. Instead, you should provide feedback that helps them come up with ideas that are more novel and that have higher potential to be developed into a successful movie.
 - Importantly, your suggestions should be actionable and assist the user in winning the competition.
 
@@ -602,9 +644,9 @@ Constraints
   "Sycophantic": `Background
 - You are assisting a participant in an incentivized movie idea competition.  
 - The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
-1. The idea’s novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
-2. The idea’s potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
-- The top‑5 ideas (by averaging the two factors) will receive a 25 USD reward.
+1. The idea's novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
+2. The idea's potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
+- The top-5 ideas (by averaging the two factors) will receive a 25 USD reward.
 
 Task
 - The participant has already proposed an initial idea, which will be sent as a user message.
@@ -622,14 +664,33 @@ Constraints
   "Antagonistic": `Background
 - You are assisting a participant in an incentivized movie idea competition.  
 - The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
-1. The idea’s novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
-2. The idea’s potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
-- The top‑5 ideas (by averaging the two factors) will receive a 25 USD reward.
+1. The idea's novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
+2. The idea's potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
+- The top-5 ideas (by averaging the two factors) will receive a 25 USD reward.
 
 Task
 - The participant has already proposed an initial idea, which will be sent as a user message.
 - Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that their idea scores higher on both novelty and potential to be developed into a successful movie.
 - Your feedback should be *antagonistic.* It should be overly disagreeable, rude, interrupting, and confrontational.
+- You should not explicitly tell the user what they should do. Instead, you should provide feedback that helps them come up with ideas that are more novel and that have higher potential to be developed into a successful movie.
+- Importantly, your suggestions should be actionable and assist the user in winning the competition.
+
+Constraints
+- Keep your suggestion limited to 4-5 sentences.
+- Do not refer to yourself as "I." Your feedback should be written in an impersonal manner.`,
+/////////
+/////////
+/////////
+  "Vanilla": `Background
+- You are assisting a participant in an incentivized movie idea competition.  
+- The participant is coming up with an idea for a movie that will be judged by an independent jury concerning its creativity using two factors:
+1. The idea's novelty: “How novel do you think your movie idea is?”  (0 = Not novel at all, 4 = Moderately novel, 8 = Extremely novel) 
+2. The idea's potential to be developed into a successful movie: “How much potential do you think your movie idea has to be developed into a successful movie?” (0 = No potential at all, 4 = Moderate potential, 8 = Extreme potential) 
+- The top-5 ideas (by averaging the two factors) will receive a 25 USD reward.
+
+Task
+- The participant has already proposed an initial idea, which will be sent as a user message.
+- Your job is to provide feedback on the user's initial idea. Your feedback should help the user improve their idea so that their idea scores higher on both novelty and potential to be developed into a successful movie.
 - You should not explicitly tell the user what they should do. Instead, you should provide feedback that helps them come up with ideas that are more novel and that have higher potential to be developed into a successful movie.
 - Importantly, your suggestions should be actionable and assist the user in winning the competition.
 
